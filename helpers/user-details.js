@@ -1,12 +1,12 @@
 import { jwtDecode } from "jwt-decode";
 
-export function getCurrentUser(localStorage) {
-    const userFields = ['userName', 'points', 'badge'];
+export function getCurrentUser() {
+    const userFields = ['userName', 'points', 'badge', 'userToken'];
     const token = localStorage.getItem('userToken');
     if (token) {
         const decodedToken = jwtDecode(token);
         if (decodedToken.exp * 1000 < new Date()) {
-            localStorage.removeItem('userToken');
+            saveCurrentUser({}, localStorage);
             return false;
         }
         return userFields.reduce((acc, field) => {
@@ -17,19 +17,7 @@ export function getCurrentUser(localStorage) {
     return false;
 }
 
-export function getCurrentUserToken(localStorage) {
-    const token = localStorage.getItem('userToken');
-    if (token) {
-        const decodedToken = jwtDecode(token);
-        if (decodedToken.exp < new Date()) {
-            localStorage.removeItem('userToken');
-            return false;
-        }
-    }
-    return token;
-}
-
-export function saveCurrentUser({username, points, badge, jwt}, localStorage) {
+export function saveCurrentUser({username, points, badge, jwt}) {
     !!username ? localStorage.setItem('userName', username) : localStorage.removeItem('userName');
     !!points ? localStorage.setItem('points', points) : localStorage.removeItem('points');
     !!badge ? localStorage.setItem('badge', badge) : localStorage.removeItem('badge');

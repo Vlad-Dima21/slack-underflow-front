@@ -24,7 +24,7 @@ const AppBar = () => {
 
   const signOut = () => {
     setCurrentUser(null);
-    router.push('/');
+    window.location.href = '/';
   }
 
   return (

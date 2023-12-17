@@ -8,11 +8,11 @@ const useCurrentUser = () => {
 
     const setUser = (user) => {
         setCurrentUser(user);
-        saveCurrentUser(user || {}, localStorage);
+        saveCurrentUser(user || {});
     }
 
     useEffect(() => {
-        setCurrentUser(getCurrentUser(localStorage));
+        setCurrentUser(getCurrentUser());
     }, [pathname]);
 
     return [currentUser, setUser];

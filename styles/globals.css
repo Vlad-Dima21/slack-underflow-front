@@ -169,3 +169,35 @@
 .flex-between {
   @apply flex justify-between items-center;
 }
+
+.topic-button {
+  @apply px-5 py-1.5 text-sm bg-white text-black rounded-full font-semibold;
+}
+
+.topic-button:hover {
+  @apply outline outline-1;
+}
+
+.topic-button-disabled {
+  @apply px-5 py-1.5 text-sm bg-white text-black rounded-full font-semibold;
+}
+
+.topic-button-selected {
+  @apply px-5 py-1.5 text-sm bg-primary-orange text-white rounded-full font-semibold;
+}
+
+.topic-button-selected:hover {
+  @apply bg-orange-500
+}
+
+.topic-button-selected-disabled {
+  @apply px-5 py-1.5 text-sm bg-primary-orange text-white rounded-full font-semibold;
+}
+
+.topic-button-text {
+  @apply px-5 py-1.5 text-sm font-semibold text-gray-700;
+}
+
+.question-container {
+  @apply w-4/5 flex flex-col align-middle justify-center sm:gap-5 gap-10 glassmorphism
+}
