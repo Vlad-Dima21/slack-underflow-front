@@ -5,7 +5,7 @@ import Answers from '@components/Answers';
 import QuestionState from '@enums/QuestionState';
 import { useCurrentUser } from '@helpers/user-hook';
 import { useRouter, } from 'next/navigation';
-import fetch from '@helpers/fetch';
+import fetchHelper from '@helpers/fetch';
 import Topic from './Topic';
 import { Button, ButtonType } from './Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -38,7 +38,7 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
     const [question, setQuestion] = useState({
         topics: [],
         body: '',
-        title: 'Titlu setat hardcodat pentru ca mihnea face actualizari fara sa zica',
+        title: 'mihnea te iubesc',
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [actionResult, setActionResult] = useState('');
@@ -60,7 +60,7 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
     const createQuestion = useCallback(async () => {
         setIsSubmitting(true);
         try {
-            const response = await fetch({
+            const response = await fetchHelper({
                 url: `${baseRoute}/question/create`, 
                 method: 'POST',
                 bearer: currentUser.userToken,
@@ -103,7 +103,7 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
     const updateQuestion = useCallback(async () => {
         setIsSubmitting(true);
         try {
-            const response = await fetch({
+            const response = await fetchHelper({
                 url: `${baseRoute}/question/modify/${questionId}`,
                 method: 'PUT',
                 bearer: currentUser.userToken,
@@ -138,7 +138,7 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
     useEffect(() => {
         const getQuestion = async () => {
             try {
-                const response = await fetch({
+                const response = await fetchHelper({
                     url: `${baseRoute}/question/get/${questionId}`,
                     method: 'GET',
                     bearer: currentUser.userToken
@@ -170,7 +170,7 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
     useEffect(() => {
         const getTopics = async () => {
             try {
-                const response = await fetch({
+                const response = await fetchHelper({
                     url: `${baseRoute}/topic/getAll`,
                     method: 'GET',
                     bearer: currentUser.userToken

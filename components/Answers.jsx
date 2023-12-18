@@ -3,7 +3,7 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import { Button, ButtonType } from './Button';
 import { useCurrentUser } from '@helpers/user-hook';
-import fetch from '@helpers/fetch';
+import fetchHelper from '@helpers/fetch';
 
 const Answers = ({ questionId, questionAuthor, baseRoute }) => {
     const [currentUser] = useCurrentUser();
@@ -17,7 +17,7 @@ const Answers = ({ questionId, questionAuthor, baseRoute }) => {
         e.preventDefault()
         setIsSubmitting(true);
         try {
-            const response = await fetch({
+            const response = await fetchHelper({
                 url: `${baseRoute}/answer/create`,
                 method: 'POST',
                 bearer: currentUser.userToken,
