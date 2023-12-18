@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 
 
-const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit }) => {
+const Question = ({ questionId, state, baseRoute }) => {
     const router = useRouter();
     const [currentUser] = useCurrentUser();
     const [author, setAuthor] = useState(null);
@@ -38,26 +38,26 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
     const [question, setQuestion] = useState({
         topics: [],
         body: '',
-        title: 'mihnea te iubesc',
+        title: '',
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [actionResult, setActionResult] = useState('');
 
     const toggleIsInEdit = useCallback(() => {
         setIsInEdit(i => !i);
-        updateIsInEdit?.(!isInEdit);
-    }, [isInEdit, updateIsInEdit]);
+    }, [isInEdit]);
 
     const toggleTopic = useCallback((topic) => {
         const tIndex = question.topics.indexOf(topic);
         if (tIndex == -1) {
-            setQuestion(q => ({ ...q, topics: [...q.topics, topic] }));
+            setQuestion(q => ({ ...q, topics: [...q.topics, topic].toSorted() }));
         } else if (question.topics.length > 1) {
-            setQuestion(q => ({ ...q, topics: q.topics.toSpliced(tIndex, 1) }));
+            setQuestion(q => ({ ...q, topics: q.topics.toSpliced(tIndex, 1).toSorted() }));
         }
     }, [topics, question]);
 
-    const createQuestion = useCallback(async () => {
+    const createQuestion = useCallback(async (e) => {
+        e.preventDefault();
         setIsSubmitting(true);
         try {
             const response = await fetchHelper({
@@ -93,14 +93,15 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
         const fields = ['Title', 'Body', 'Topics', 'Timestamp'],
             _question = fields.reduce((acc, field) => {
                 acc[field.toLowerCase()] = question[`old${field}`];
+                acc[`old${field}`] = question[`old${field}`];
                 return acc;
             }, {});
         setQuestion(_question);
         setIsInEdit(i => !i);
-        updateIsInEdit?.(!isInEdit);
     }, [question]);
 
-    const updateQuestion = useCallback(async () => {
+    const updateQuestion = useCallback(async (e) => {
+        e.preventDefault();
         setIsSubmitting(true);
         try {
             const response = await fetchHelper({
@@ -123,6 +124,7 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
                     acc[field.toLowerCase()] = acc[`old${field}`] = data[field.toLowerCase()];
                     return acc;
                 }, {});
+            _question.topics = _question.oldTopics = _question.oldTopics.toSorted();
             setQuestion(_question);
             setIsInEdit(false);
         } catch (error) {
@@ -150,8 +152,8 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
                             acc[field.toLowerCase()] = acc[`old${field}`] = questionData[field.toLowerCase()];
                             return acc;
                         }, {});
-                    _question.title = _question.oldTitle = 'Titlu setat hardcodat pentru ca mihnea face actualizari fara sa zica';
-                    _question.topics = _question.oldTopics = ['UML']; //TODO scoate asta
+                    _question.title = _question.oldTitle = 'Titlu temporar'; //todo
+                    _question.topics = _question.oldTopics =_question.oldTopics.toSorted();
                     setQuestion(_question);
                     setAuthor(questionData.user);
                 } else {
@@ -177,7 +179,8 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setTopics(data.map(topic => topic.topic) || []);
+                    setTopics(data.map(topic => topic.topic).toSorted() || []);
+                    setQuestion(q => ({ ...q, topics: [data[0].topic] }));
                 }
             } catch (error) {
                 console.log(error);
@@ -195,7 +198,7 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
                 <h1 className='head_text text-left'>
                     <span className='blue_gradient'>{title}</span>
                 </h1>
-                {!isInEdit && (<button
+                {isAuthor && !isInEdit && (<button
                     className='text-3xl h-min self-end pb-2 ml-2'
                     onClick={() => toggleIsInEdit(i => !i)}>
                     <FontAwesomeIcon icon={faPenToSquare} />
@@ -204,7 +207,7 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
             <div className='flex flex-col'>
             <span className='form-label'>Topics</span>
             <div className='mt-2 flex align-middle gap-2 sm:gap-4'>
-                {(isInEdit ? topics : question.topics).map(topic => (
+                {(isInEdit ? topics : question.topics)?.map(topic => (
                     <Topic
                         key={topic}
                         enabled={isInEdit}
@@ -215,37 +218,55 @@ const Question = ({ questionId, state, baseRoute, setIsInEdit: updateIsInEdit })
                 ))}
             </div>
             </div>
-            <label>
-            <span className='form-label'>
-                Description
-            </span>
-            <textarea
-                disabled={!isInEdit}
-                value={question.body}
-                onChange={e => setQuestion(q => ({ ...q, body: e.target.value }))}
-                placeholder='Write the question'
-                className='form_textarea !text-black'
-            />
-            </label>
-            <div className='flex justify-between'>
-                <span className='px-2 py-1 text-red-500'>{actionResult}</span>
-                {isInEdit && <div className='flex align-middle sm:gap-4 gap-2'>
-                    <Button
-                        text='Cancel'
-                        enabled={true}
-                        type={ButtonType.Text}
-                        onClick={!isNewQuestion ? cancelQuestion : undefined}
-                        link={isNewQuestion ? '/' : undefined}
-                    />
-                    <Button
-                        text='Submit'
-                        enabled={!isSubmitting}
-                        type={ButtonType.Fill}
-                        onClick={isNewQuestion ? createQuestion : updateQuestion}
-                        className='!text-white !bg-indigo-700 hover:!bg-indigo-600'
-                    />
-                </div>}
-            </div>
+            <form
+              className='flex flex-col gap-7'
+              onSubmit={isNewQuestion ? createQuestion : updateQuestion}>
+              <label>
+                <span className='form-label'>
+                    Title
+                </span>
+                <input
+                    disabled={!isInEdit}
+                    value={question.title}
+                    onChange={e => setQuestion(q => ({ ...q, title: e.target.value }))}
+                    placeholder='Title...'
+                    className='form_input !text-black'
+                    required
+                />
+                </label>
+                <label>
+                <span className='form-label'>
+                    Description
+                </span>
+                <textarea
+                    disabled={!isInEdit}
+                    value={question.body}
+                    onChange={e => setQuestion(q => ({ ...q, body: e.target.value }))}
+                    placeholder='Write the question'
+                    className='form_textarea !text-black'
+                    required
+                />
+                </label>
+                <div className='mx-2 flex justify-between'>
+                    <span className='text-red-500'>{actionResult}</span>
+                    {isInEdit && <div className='flex align-middle sm:gap-4 gap-2'>
+                        <Button
+                            text='Cancel'
+                            enabled={true}
+                            type={ButtonType.Text}
+                            onClick={!isNewQuestion ? cancelQuestion : undefined}
+                            link={isNewQuestion ? '/' : undefined}
+                        />
+                        <Button
+                            text='Submit'
+                            formSubmit={true}
+                            enabled={!isSubmitting}
+                            type={ButtonType.Fill}
+                            className='!text-white !bg-indigo-700 hover:!bg-indigo-600'
+                        />
+                    </div>}
+                </div>  
+            </form>
         </div>
         {state != QuestionState.New && <Answers
             questionId={questionId}

@@ -14,17 +14,17 @@ const Answers = ({ questionId, questionAuthor, baseRoute }) => {
     const allowComment = useMemo(() => currentUser && questionAuthor?.username != currentUser.userName
         , [questionAuthor, currentUser]);
     const postComment = useCallback(async (e) => {
-        e.preventDefault()
+        e.preventDefault();
         setIsSubmitting(true);
         try {
             const response = await fetchHelper({
                 url: `${baseRoute}/answer/create`,
                 method: 'POST',
                 bearer: currentUser.userToken,
-                body: {
+                body: JSON.stringify({
                     body: comment,
                     questionId: questionId
-                }
+                })
             });
             if (!response.ok) {
                 setSubmitResult('Could not add comment');
@@ -36,6 +36,7 @@ const Answers = ({ questionId, questionAuthor, baseRoute }) => {
             console.log(error);
             setSubmitResult('There was an error. Please try again');
         } finally {
+            setIsSubmitting(false);
             setComment('');
             setTimeout(() => {
                 setSubmitResult('');

@@ -14,7 +14,7 @@ const ButtonType = {
 }
 
 
-const Button = ({ text, onClick, enabled, type, link, className: clsName }) => {
+const Button = ({ text, onClick, enabled, type, link, className: clsName, formRequired: formSubmit }) => {
     const className = useMemo(() => {
         switch (type) {
             case ButtonType.Fill:
@@ -38,6 +38,7 @@ const Button = ({ text, onClick, enabled, type, link, className: clsName }) => {
                 className={style}
                 onClick={onClick}
                 disabled={!enabled}
+                type={formSubmit ? 'submit' : undefined}
             >
                 {text}
             </button>
