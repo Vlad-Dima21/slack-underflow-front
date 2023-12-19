@@ -10,6 +10,7 @@ import Topic from './Topic';
 import { Button, ButtonType } from './Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
+import LoadingWrapper from './LoadingWrapper';
 
 
 const Question = ({ questionId, state, baseRoute }) => {
@@ -20,6 +21,15 @@ const Question = ({ questionId, state, baseRoute }) => {
     const isAuthor = useMemo(() => author && author?.username == currentUser?.userName, [currentUser, author]);
     const editEnabled = useMemo(() => isNewQuestion || isAuthor, [state, isAuthor]);
     const [isInEdit, setIsInEdit] = useState(isNewQuestion);
+
+    const [topics, setTopics] = useState([]);
+    const [question, setQuestion] = useState({
+        topics: [],
+        body: '',
+        title: '',
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [actionResult, setActionResult] = useState('');
     
     const title = useMemo(() => {
         if (isNewQuestion) {
@@ -33,19 +43,6 @@ const Question = ({ questionId, state, baseRoute }) => {
         }
         return  'Loading...'
     }, [currentUser, author, isAuthor]);
-
-    const [topics, setTopics] = useState([]);
-    const [question, setQuestion] = useState({
-        topics: [],
-        body: '',
-        title: '',
-    });
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [actionResult, setActionResult] = useState('');
-
-    const toggleIsInEdit = useCallback(() => {
-        setIsInEdit(i => !i);
-    }, [isInEdit]);
 
     const toggleTopic = useCallback((topic) => {
         const tIndex = question.topics.indexOf(topic);
@@ -71,7 +68,8 @@ const Question = ({ questionId, state, baseRoute }) => {
                 })
             });
             if (!response.ok) {
-                setActionResult('Could not add question');
+                const data = await response.json();
+                setActionResult(data?.message || data?.title || 'Could not add question');
                 return;
             }
             const data = await response.json();
@@ -115,7 +113,8 @@ const Question = ({ questionId, state, baseRoute }) => {
                 })
             });
             if (!response.ok) {
-                setActionResult('Could not update the question');
+                const data = await response.json();
+                setActionResult(data?.message || data?.title || 'Could not update the question');
                 return;
             }
             const data = await response.json();
@@ -137,6 +136,13 @@ const Question = ({ questionId, state, baseRoute }) => {
         }
     }, [question, topics, currentUser]);
 
+  const isLoading = useMemo(() => {
+    if (state == QuestionState.New) {
+      return false;
+    }
+    return !question.topics.length || !topics.length;
+    }, [currentUser, question, topics, state]);
+
     useEffect(() => {
         const getQuestion = async () => {
             try {
@@ -152,10 +158,11 @@ const Question = ({ questionId, state, baseRoute }) => {
                             acc[field.toLowerCase()] = acc[`old${field}`] = questionData[field.toLowerCase()];
                             return acc;
                         }, {});
-                    _question.title = _question.oldTitle = 'Titlu temporar'; //todo
+                    _question.title = _question.oldTitle;
                     _question.topics = _question.oldTopics =_question.oldTopics.toSorted();
                     setQuestion(_question);
                     setAuthor(questionData.user);
+                    document.title = _question.title;
                 } else {
                     router.push('/not-found');
                 }
@@ -181,6 +188,9 @@ const Question = ({ questionId, state, baseRoute }) => {
                     const data = await response.json();
                     setTopics(data.map(topic => topic.topic).toSorted() || []);
                     setQuestion(q => ({ ...q, topics: [data[0].topic] }));
+                } else {
+                    const data = await response.json();
+                    setActionResult(data?.message || data?.title || 'Could not fetch topics');
                 }
             } catch (error) {
                 console.log(error);
@@ -193,6 +203,8 @@ const Question = ({ questionId, state, baseRoute }) => {
     }, [currentUser]);
   return (
       <section className='flex flex-col gap-10 align-middle w-full justify-center'>
+        <LoadingWrapper
+          loadingState={isLoading}>
           <div className='question-container'>
             <div className='flex justify-between align-middle'>
                 <h1 className='head_text text-left'>
@@ -200,7 +212,7 @@ const Question = ({ questionId, state, baseRoute }) => {
                 </h1>
                 {isAuthor && !isInEdit && (<button
                     className='text-3xl h-min self-end pb-2 ml-2'
-                    onClick={() => toggleIsInEdit(i => !i)}>
+                    onClick={() => setIsInEdit(i => !i)}>
                     <FontAwesomeIcon icon={faPenToSquare} />
                 </button>)}  
             </div>
@@ -267,12 +279,13 @@ const Question = ({ questionId, state, baseRoute }) => {
                     </div>}
                 </div>  
             </form>
-        </div>
-        {state != QuestionState.New && <Answers
-            questionId={questionId}
-              questionAuthor={author}
-              baseRoute={baseRoute}
-        />}
+          </div>
+          {state != QuestionState.New && <Answers
+              questionId={questionId}
+                questionAuthor={author}
+                baseRoute={baseRoute}
+          />}
+        </LoadingWrapper>
     </section>
   )
 }
