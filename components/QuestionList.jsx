@@ -9,7 +9,7 @@ import LoadingWrapper from "./LoadingWrapper";
 export default function QuestionList({ baseUrl }) {
     const [currentUser] = useCurrentUser();
     const [questions, setQuestions] = useState(null);
-    const questionsLoading = useMemo(() => questions == null, [currentUser, questions]);
+    const questionsLoading = useMemo(() => currentUser && questions == null, [currentUser, questions]);
     const containerClass = useMemo(() => {
         console.log(questions?.length % 3 ? (questions?.length % 2 ? 1 : 2) : 3);
         return `grid grid-cols-${questions?.length % 3 ? (questions?.length % 2 ? 1 : 2) : 3} sm:gap-5 gap-3`;
@@ -45,7 +45,7 @@ export default function QuestionList({ baseUrl }) {
         <div className="flex flex-col gap-5">
             <LoadingWrapper
                 loadingState={questionsLoading}>
-                <h2 className="font-satoshi ps-2 font-semibold text-lg self-start">Recent questions</h2>
+                {currentUser && (<h2 className="font-satoshi ps-2 font-semibold text-lg self-start">Recent questions</h2>)}
                 <div className={containerClass}>
                     {questions?.map(q => (
                         <QuestionCard
