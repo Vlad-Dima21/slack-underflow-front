@@ -11,7 +11,6 @@ export default function QuestionList({ baseUrl }) {
     const [questions, setQuestions] = useState(null);
     const questionsLoading = useMemo(() => currentUser && questions == null, [currentUser, questions]);
     const containerClass = useMemo(() => {
-        console.log(questions?.length % 3 ? (questions?.length % 2 ? 1 : 2) : 3);
         return `grid grid-cols-${questions?.length % 3 ? (questions?.length % 2 ? 1 : 2) : 3} sm:gap-5 gap-3`;
     },
         [questions]
@@ -33,7 +32,7 @@ export default function QuestionList({ baseUrl }) {
             } catch (error) {
                 console.log(error);
             } finally {
-                !data.length && setQuestions([]);
+                !data?.length && setQuestions([]);
             }
         }
         if (currentUser) {
@@ -45,8 +44,8 @@ export default function QuestionList({ baseUrl }) {
         <div className="flex flex-col gap-5">
             <LoadingWrapper
                 loadingState={questionsLoading}>
-                {currentUser && (<h2 className="font-satoshi ps-2 font-semibold text-lg self-start">Recent questions</h2>)}
-                <div className={containerClass}>
+                {!!questions?.length && (<h2 className="font-satoshi ps-2 font-semibold text-lg self-start">Recent questions</h2>)}
+                <div className={`${containerClass} overflow-auto mb-16`}>
                     {questions?.map(q => (
                         <QuestionCard
                             key={q.id}
