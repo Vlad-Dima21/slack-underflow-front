@@ -141,10 +141,6 @@
   @apply max-sm:hidden font-satoshi font-semibold text-lg text-black tracking-wide;
 }
 
-.dropdown {
-  @apply absolute right-0 top-full mt-3 w-full p-5 rounded-lg bg-white min-w-[210px] flex flex-col gap-2 justify-end items-end;
-}
-
 .dropdown_link {
   @apply text-sm font-inter text-gray-700 hover:text-gray-500 font-medium;
 }
@@ -256,3 +252,22 @@
 .question-card-title {
   @apply text-sm font-inter text-black hover:text-gray-800 font-medium text-ellipsis overflow-hidden whitespace-nowrap sm:max-w-[24rem] max-w-[15rem];
 }
+
+.dropdown {
+  /* position: relative;
+  display: inline-block; */
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 120px;
+  border-radius: 10px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content :hover { @apply cursor-pointer; background-color: #ddd; border-radius: 10px;}
+
+.dropdown:hover .dropdown-content {display: block;}

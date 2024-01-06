@@ -88,12 +88,12 @@ const Answers = ({ questionId, questionAuthor, baseRoute }) => {
           </form>
           <div className='flex flex-col gap-4'>
               {questionAnswers.map((answer, index) =>
-                  <div className='flex flex-col gap-2'>
+                  <div key={answer.id} className='flex flex-col gap-2'>
                     <Answer
-                        key={answer.id}
                         baseRoute={baseRoute}
                         answer={answer}
                         onDeleted={(id) => setQuestionAnswers(answers => answers.toSpliced(answers.findIndex(a => a.id == id), 1))}
+                        onChanged={answer => setQuestionAnswers(answers => answers.toSpliced(answers.findIndex(a => a.id == answer.id), 1, answer))}  
                       />
                       {index != questionAnswers.length - 1 && <hr/>}
                   </div>)}
