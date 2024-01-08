@@ -14,8 +14,8 @@ const Answer = ({ baseRoute, answer, onDeleted, onChanged }) => {
         shown: false,
         isSubmitting: false
     });
-    const isAuthor = currentUser?.userName == answer.user.username;
-    const isAuthorOfQuestion = currentUser?.userName == answer.question.user.username;
+    const isAuthor = currentUser?.userName == answer?.user?.username;
+    const isAuthorOfQuestion = currentUser?.userName == answer?.question?.user?.username;
 
     const deleteAnswer = async () => {
         if (!confirm(`Confirm answer deletion`)) {
@@ -27,7 +27,6 @@ const Answer = ({ baseRoute, answer, onDeleted, onChanged }) => {
                 method: 'DELETE',
                 bearer: currentUser.userToken
             });
-            const message = await response.json();
             if (response.ok) {
                 onDeleted(answer.id);
             }
@@ -100,15 +99,21 @@ const Answer = ({ baseRoute, answer, onDeleted, onChanged }) => {
 
     return (
         <div className='flex flex-col gap-3 justify-center'>
-            <div className='flex justify-between align-middle'>
+            <div className='flex justify-between items-center'>
                 <div className='flex flex-col gap-2 bg-green-400/10 p-4 rounded-3xl'>
                     <div className='flex gap-1'>
-                        <span className='text-gray-600 text-sm'>@{answer.user.username}</span>
+                        <span className='text-gray-600 text-sm'>@{answer?.user?.username}</span>
                         <span className='!whitespace-normal !max-w-[34rem] question-card-title'>{answer.body}</span>
                     </div>
                     <span className='text-xs font-medium'>{new Date(answer.createTimestamp).toUTCString()}</span>
                 </div>
                 <div className='flex align-middle gap-3'>
+                    {!isAuthorOfQuestion && <div
+                            className={`m-2 text-sm ${answer.rank ? 'text-yellow-600' : 'text-gray-700'}`}
+                        >
+                            <FontAwesomeIcon icon={faAward} />
+                            {answer.rank || ''}
+                        </div>}
                     {!isAuthor && isAuthorOfQuestion && <DropdownList
                         className='flex justify-center items-center'
                         parent={
