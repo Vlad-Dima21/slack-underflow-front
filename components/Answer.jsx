@@ -45,7 +45,7 @@ const Answer = ({ baseRoute, answer, onDeleted, onChanged }) => {
             });
             const data = await response.json();
             if (response.ok) {
-                onChanged(data);
+                onChanged(data.find(d => d.id == answer.id));
             }
         } catch (error) {
             console.log(error);
