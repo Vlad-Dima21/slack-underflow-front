@@ -37,9 +37,10 @@ const Answer = ({ baseRoute, answer, onDeleted, onChanged }) => {
     }
 
     const setRank = async (rank) => {
+        const newRank = rank == answer.rank ? 0 : rank;
         try {
             const response = await fetchHelper({
-                url: `${baseRoute}/answer/modify/rank/${answer.id}?rank=${rank}`,
+                url: `${baseRoute}/answer/modify/rank/${answer.id}?rank=${newRank}`,
                 method: 'PATCH',
                 bearer: currentUser.userToken
             });

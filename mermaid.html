@@ -40,11 +40,19 @@
     1 ---&gt;|YES|2[Edit question]
     1 ---&gt;|YES|3[Give rank to answer]
     1 ---&gt;|NO|4[Post answer]
+    1 ---&gt;|NO|8[Delete answer]
     1 ---&gt;|NO|5[Give suggestion to answer]
     J ---&gt; 2
     J ---&gt; 3
     G ---&gt; 6[Disconnect]
     6 ---&gt; A
+    D ---&gt;|Bad credentials|C
+    E ---&gt;|Username is already in use|C
+    I ---&gt;|Question not found|G
+    H ---&gt;|Fields not filled|G
+    H ---&gt;|Title too long|G
+    2 ---&gt;|Title too long|7{\n\n\n}
+    2 ---&gt;|Fields not filled|7
 </div>
       </div>
       

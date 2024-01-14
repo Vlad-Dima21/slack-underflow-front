@@ -1,5 +1,6 @@
 ```mermaid
 flowchart TB
+    0((‎‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ )) ---> A
     A[Home page] --> B{Is logged in}
     B --->|No| C{Authentication}
     C ---> D[Log In]
@@ -11,22 +12,25 @@ flowchart TB
     G ---> H[Create question]
     G ---> I[Access question]
     H ---> J[View question]
-    I ---> 1{Is author}
-    1 --->|YES|2[Edit question]
-    1 --->|YES|3[Give rank to answer]
-    1 --->|NO|4[Post answer]
-    1 --->|NO|8[Delete answer]
-    1 --->|NO|5[Give suggestion to answer]
-    J ---> 2
-    J ---> 3
-    G ---> 6[Disconnect]
-    6 ---> A
+    I ---> A9{Registered}
+    A9 ---> B1{Is author}
+    B1 --->A2[Edit question]
+    B1 --->A3[Give rank to answer]
+    B1 ---> A5
+    A10 ---> A8[Delete answer]
+    A9 ---> A10[Is answer author]
+    A9 ---> A5[Give suggestion to answer]
+    J ---> A2
+    J ---> A3
+    G ---> A6[Disconnect]
+    A6 ---> A
     D --->|Bad credentials|C
     E --->|Username is already in use|C
     I --->|Question not found|G
     H --->|Fields not filled|G
     H --->|Title too long|G
-    2 ---> |Title too long|7{\n\n\n}
-    2 ---> |Fields not filled|7
-    
+    A2 --->|Title too long|A7{\n\n\n}
+    A2 --->|Fields not filled|A7
+    A10 ---> A40[Post answer]
+    A7 ---> J
 ```
