@@ -93,7 +93,7 @@ const Answers = ({ questionId, questionAuthor, baseRoute }) => {
                         baseRoute={baseRoute}
                         answer={answer}
                         onDeleted={(id) => setQuestionAnswers(answers => answers.toSpliced(answers.findIndex(a => a.id == id), 1))}
-                        onChanged={answer => setQuestionAnswers(answers => answers.toSpliced(answers.findIndex(a => a.id == answer.id), 1, answer))}  
+                        onChanged={answers => setQuestionAnswers(answers)}  
                       />
                       {index != questionAnswers.length - 1 && <hr/>}
                   </div>)}
